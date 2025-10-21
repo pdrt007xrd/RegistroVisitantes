@@ -156,3 +156,4 @@
 /home/mrb/Desktop/RegistroVisitantes/WebApp.RegistroVisitantes/bin/Debug/net8.0/runtimes/browser/lib/net8.0/System.Text.Encodings.Web.dll
 /home/mrb/Desktop/RegistroVisitantes/WebApp.RegistroVisitantes/obj/Debug/net8.0/WebApp.RegistroVisitantes.csproj.AssemblyReference.cache
 /home/mrb/Desktop/RegistroVisitantes/WebApp.RegistroVisitantes/obj/Debug/net8.0/WebApp.RegistroVisitantes.csproj.CopyComplete
+/home/mrb/Desktop/RegistroVisitantes/WebApp.RegistroVisitantes/obj/Debug/net8.0/WebApp.RegistroVisitantes.sourcelink.json
