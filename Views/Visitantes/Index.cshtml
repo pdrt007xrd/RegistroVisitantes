@@ -1,0 +1,141 @@
+@{
+    ViewData["Title"] = "Registro de Visitantes";
+}
+
+<h2 class="mb-4">Registro de Visitantes</h2>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form id="formVisitante">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="Nombre" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="Nombre" placeholder="Nombre del visitante">
+                    <span class="text-danger" id="errorNombre"></span>
+                </div>
+                <div class="col-md-4">
+                    <label for="Cedula" class="form-label">Cédula</label>
+                    <input type="text" class="form-control" id="Cedula" placeholder="Ej: 001-0000000-0">
+                    <span class="text-danger" id="errorCedula"></span>
+                </div>
+                <div class="col-md-4">
+                    <label for="Motivo" class="form-label">Motivo</label>
+                    <input type="text" class="form-control" id="Motivo" placeholder="Motivo de la visita">
+                    <span class="text-danger" id="errorMotivo"></span>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="agregarVisitante()">Agregar</button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table id="tablaVisitantes" class="table table-striped table-bordered w-100"></table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+
+    <script>
+        $(document).ready(function () {
+            // Inicializar DataTable
+            $('#tablaVisitantes').DataTable({
+                ajax: {
+                    url: '/Visitantes/Listar',
+                    type: 'GET',
+                    datatype: 'json'
+                },
+                columns: [
+                    { data: 'id', title: 'ID' },
+                    { data: 'nombre', title: 'Nombre' },
+                    { data: 'cedula', title: 'Cédula' },
+                    { data: 'motivo', title: 'Motivo' },
+                    {
+                        data: 'fechaHora',
+                        title: 'Fecha y Hora',
+                        render: function (data) {
+                            return new Date(data).toLocaleString();
+                        }
+                    }
+                ],
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+                }
+            });
+
+            $("#Nombre").focus();
+
+            // Validación en tiempo real: al escribir se elimina el error y borde rojo
+            $("#Nombre").on('input', function () {
+                if ($(this).val().trim() !== '') {
+                    $(this).removeClass('is-invalid');
+                    $("#errorNombre").text('');
+                }
+            });
+
+            $("#Cedula").on('input', function () {
+                if ($(this).val().trim() !== '') {
+                    $(this).removeClass('is-invalid');
+                    $("#errorCedula").text('');
+                }
+            });
+
+            $("#Motivo").on('input', function () {
+                if ($(this).val().trim() !== '') {
+                    $(this).removeClass('is-invalid');
+                    $("#errorMotivo").text('');
+                }
+            });
+        });
+
+        function agregarVisitante() {
+            // Limpiar errores y estilos anteriores
+            $("#errorNombre, #errorCedula, #errorMotivo").text('');
+            $("#Nombre, #Cedula, #Motivo").removeClass('is-invalid');
+
+            var visitante = {
+                Nombre: $("#Nombre").val(),
+                Cedula: $("#Cedula").val(),
+                Motivo: $("#Motivo").val()
+            };
+
+            $.ajax({
+                url: '/Visitantes/Agregar',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(visitante),
+                success: function (response) {
+                    if (response.success) {
+                        $('#tablaVisitantes').DataTable().ajax.reload();
+                        $('#Nombre, #Cedula, #Motivo').val('');
+                        $("#Nombre").focus();
+                    } else if (response.errores) {
+                        // Mostrar errores debajo de cada campo y aplicar borde rojo
+                        response.errores.forEach(function (err) {
+                            if (err.toLowerCase().includes("nombre")) {
+                                $("#errorNombre").text(err);
+                                $("#Nombre").addClass('is-invalid');
+                            }
+                            if (err.toLowerCase().includes("cédula")) {
+                                $("#errorCedula").text(err);
+                                $("#Cedula").addClass('is-invalid');
+                            }
+                            if (err.toLowerCase().includes("motivo")) {
+                                $("#errorMotivo").text(err);
+                                $("#Motivo").addClass('is-invalid');
+                            }
+                        });
+                    }
+                },
+                error: function (xhr) {
+                    alert('Error ' + xhr.status + ': ' + xhr.statusText);
+                }
+            });
+        }
+    </script>
+}
