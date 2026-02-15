@@ -19,6 +19,104 @@
         .card {
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
         }
+        .toast-stack {
+            z-index: 1200;
+            top: 24px;
+            right: 24px;
+        }
+        .toast.custom-toast {
+            width: min(420px, calc(100vw - 24px));
+            background: #fffffe;
+            border: 1px solid #e8ecf2;
+            border-left: 6px solid #79ed8d;
+            border-radius: 14px;
+            box-shadow: 0 16px 36px rgba(67, 76, 58, 0.18);
+            overflow: hidden;
+        }
+        .custom-toast .toast-header {
+            background: transparent;
+            color: #1f2937;
+            border-bottom: 0;
+            padding: 0.9rem 1rem 0.5rem;
+        }
+        .custom-toast .toast-body {
+            color: #4b5563;
+            font-size: 0.95rem;
+            padding: 0 1rem 1rem;
+        }
+        .toast-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #e8fdee;
+            color: #1f9d4e;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-right: 0.65rem;
+            flex-shrink: 0;
+        }
+        .toast-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin: 0;
+            line-height: 1.2;
+        }
+        .toast-subtitle {
+            margin: 0;
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+        .custom-toast .btn-close {
+            filter: none;
+            opacity: 0.5;
+            margin-left: 0.75rem;
+        }
+        .custom-toast .btn-close:hover {
+            opacity: 0.9;
+        }
+        .toast-progress {
+            display: block;
+            height: 3px;
+            background: #79ed8d;
+            width: 100%;
+            transform-origin: left center;
+            animation: toastTimer 4.5s linear forwards;
+        }
+        @@keyframes toastTimer {
+            from {
+                transform: scaleX(1);
+            }
+            to {
+                transform: scaleX(0);
+            }
+        }
+        .toast.custom-toast.showing,
+        .toast.custom-toast.show {
+            animation: toastIn 260ms ease-out;
+        }
+        @@keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px) translateX(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) translateX(0);
+            }
+        }
+        @@media (max-width: 576px) {
+            .toast-stack {
+                left: 12px;
+                right: 12px;
+                top: 12px;
+            }
+            .toast.custom-toast {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -160,15 +258,20 @@
     </div>
 
     <!-- Toast notification -->
-    <div class="position-fixed top-0 start-50 p-3" style="z-index: 11; transform: translateX(-50%); margin-top: 20px;">
-        <div id="toastExito" class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="min-width: 400px;">
-            <div class="toast-header bg-success text-white fs-5">
-                <strong class="me-auto">✓ ¡Éxito!</strong>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+    <div class="position-fixed toast-stack p-0">
+        <div id="toastExito" class="toast custom-toast" role="alert" aria-live="polite" aria-atomic="true" data-bs-autohide="true" data-bs-delay="4500">
+            <div class="toast-header">
+                <span class="toast-icon">✓</span>
+                <div class="me-auto">
+                    <p class="toast-title">Registro completado</p>
+                    <p class="toast-subtitle">Notificación de éxito</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar"></button>
             </div>
-            <div class="toast-body fs-5 py-3">
-                ¡Contacto guardado con éxito!
+            <div class="toast-body">
+                Se ha registrado el visitante
             </div>
+            <span class="toast-progress" aria-hidden="true"></span>
         </div>
     </div>
 
@@ -177,6 +280,24 @@
         const API_URL = '/api/visitas';
         let paginaActual = 1;
         const modal = new bootstrap.Modal(document.getElementById('modalPDF'));
+
+        function mostrarToastExito() {
+            const toastEl = document.getElementById('toastExito');
+            const progressEl = toastEl.querySelector('.toast-progress');
+            if (progressEl) {
+                progressEl.style.animation = 'none';
+                void progressEl.offsetWidth;
+                progressEl.style.animation = '';
+            }
+
+            const existingToast = bootstrap.Toast.getInstance(toastEl);
+            if (existingToast) {
+                existingToast.dispose();
+            }
+
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
 
         // Validar y formatear cédula XXX-XXXXXXX-X
         function formatearCedula(cedula) {
@@ -337,9 +458,7 @@
                 }
                 
                 // Mostrar toast de éxito
-                const toastEl = document.getElementById('toastExito');
-                const toast = new bootstrap.Toast(toastEl);
-                toast.show();
+                mostrarToastExito();
                 
                 document.getElementById('formContacto').reset();
                 // Limpiar clases de validación
