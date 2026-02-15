@@ -1,0 +1,6 @@
+@VisitasApi_HostAddress = http://localhost:5144
+
+GET {{VisitasApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
