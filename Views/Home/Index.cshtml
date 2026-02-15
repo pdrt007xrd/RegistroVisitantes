@@ -65,13 +65,15 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Empresa Proveniente</label>
-                                    <input type="text" class="form-control" id="empresaProveniente" placeholder="Empresa" maxlength="100">
+                                    <label class="form-label">Empresa Proveniente <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="empresaProveniente" placeholder="Empresa" minlength="3" maxlength="100" required>
+                                    <small class="form-text text-muted">Entre 3 y 100 caracteres</small>
                                     <div class="invalid-feedback d-block" id="errorEmpresa"></div>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Dónde Visita</label>
-                                    <input type="text" class="form-control" id="dondeVisita" placeholder="Departamento/Área" maxlength="100">
+                                    <label class="form-label">Dónde Visita <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="dondeVisita" placeholder="Departamento/Área" minlength="3" maxlength="100" required>
+                                    <small class="form-text text-muted">Entre 3 y 100 caracteres</small>
                                     <div class="invalid-feedback d-block" id="errorDonde"></div>
                                 </div>
                             </div>
@@ -221,9 +223,13 @@
             }
 
             // Validar empresa proveniente
-            if (empresaProveniente && empresaProveniente.length > 100) {
-                errores.push('La empresa no puede exceder 100 caracteres');
-                document.getElementById('errorEmpresa').textContent = 'No puede exceder 100 caracteres';
+            if (!empresaProveniente) {
+                errores.push('La empresa proveniente es obligatoria');
+                document.getElementById('errorEmpresa').textContent = 'La empresa es obligatoria';
+                document.getElementById('empresaProveniente').classList.add('is-invalid');
+            } else if (empresaProveniente.length < 3 || empresaProveniente.length > 100) {
+                errores.push('La empresa debe tener entre 3 y 100 caracteres');
+                document.getElementById('errorEmpresa').textContent = 'Entre 3 y 100 caracteres';
                 document.getElementById('empresaProveniente').classList.add('is-invalid');
             } else {
                 document.getElementById('errorEmpresa').textContent = '';
@@ -231,9 +237,13 @@
             }
 
             // Validar dónde visita
-            if (dondeVisita && dondeVisita.length > 100) {
-                errores.push('El lugar de visita no puede exceder 100 caracteres');
-                document.getElementById('errorDonde').textContent = 'No puede exceder 100 caracteres';
+            if (!dondeVisita) {
+                errores.push('El lugar de visita es obligatorio');
+                document.getElementById('errorDonde').textContent = 'El lugar de visita es obligatorio';
+                document.getElementById('dondeVisita').classList.add('is-invalid');
+            } else if (dondeVisita.length < 3 || dondeVisita.length > 100) {
+                errores.push('El lugar de visita debe tener entre 3 y 100 caracteres');
+                document.getElementById('errorDonde').textContent = 'Entre 3 y 100 caracteres';
                 document.getElementById('dondeVisita').classList.add('is-invalid');
             } else {
                 document.getElementById('errorDonde').textContent = '';
@@ -378,6 +388,34 @@
                 if (valor.replace(/\D/g, '') === limpia) {
                     e.target.value = formateada;
                 }
+            }
+        });
+
+        document.getElementById('empresaProveniente').addEventListener('input', () => {
+            const valor = document.getElementById('empresaProveniente').value.trim();
+            if (!valor) {
+                document.getElementById('errorEmpresa').textContent = 'La empresa es obligatoria';
+                document.getElementById('empresaProveniente').classList.add('is-invalid');
+            } else if (valor.length < 3 || valor.length > 100) {
+                document.getElementById('errorEmpresa').textContent = 'Entre 3 y 100 caracteres';
+                document.getElementById('empresaProveniente').classList.add('is-invalid');
+            } else {
+                document.getElementById('errorEmpresa').textContent = '';
+                document.getElementById('empresaProveniente').classList.remove('is-invalid');
+            }
+        });
+
+        document.getElementById('dondeVisita').addEventListener('input', () => {
+            const valor = document.getElementById('dondeVisita').value.trim();
+            if (!valor) {
+                document.getElementById('errorDonde').textContent = 'El lugar de visita es obligatorio';
+                document.getElementById('dondeVisita').classList.add('is-invalid');
+            } else if (valor.length < 3 || valor.length > 100) {
+                document.getElementById('errorDonde').textContent = 'Entre 3 y 100 caracteres';
+                document.getElementById('dondeVisita').classList.add('is-invalid');
+            } else {
+                document.getElementById('errorDonde').textContent = '';
+                document.getElementById('dondeVisita').classList.remove('is-invalid');
             }
         });
 
