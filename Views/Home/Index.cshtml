@@ -77,13 +77,6 @@
                                     <div class="invalid-feedback d-block" id="errorDonde"></div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Fecha de Visita <span class="text-danger">*</span></label>
-                                    <input type="date" class="form-control" id="fechaVisita" required>
-                                    <div class="invalid-feedback d-block" id="errorFecha"></div>
-                                </div>
-                            </div>
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                 <button type="reset" class="btn btn-secondary">Limpiar Campos</button>
                                 <button type="submit" class="btn btn-success">Guardar Contacto</button>
@@ -192,7 +185,6 @@
             const cedula = document.getElementById('cedula').value.trim();
             const empresaProveniente = document.getElementById('empresaProveniente').value.trim();
             const dondeVisita = document.getElementById('dondeVisita').value.trim();
-            const fechaVisita = document.getElementById('fechaVisita').value;
 
             // Validar nombre
             if (!nombre) {
@@ -248,16 +240,6 @@
             } else {
                 document.getElementById('errorDonde').textContent = '';
                 document.getElementById('dondeVisita').classList.remove('is-invalid');
-            }
-
-            // Validar fecha
-            if (!fechaVisita) {
-                errores.push('La fecha de visita es obligatoria');
-                document.getElementById('errorFecha').textContent = 'La fecha es obligatoria';
-                document.getElementById('fechaVisita').classList.add('is-invalid');
-            } else {
-                document.getElementById('errorFecha').textContent = '';
-                document.getElementById('fechaVisita').classList.remove('is-invalid');
             }
 
             return errores;
@@ -330,8 +312,7 @@
                 nombre: document.getElementById('nombre').value.trim(),
                 cedula: cedulaFormateada,
                 empresaProveniente: document.getElementById('empresaProveniente').value.trim(),
-                dondeVisita: document.getElementById('dondeVisita').value.trim(),
-                fechaVisita: document.getElementById('fechaVisita').value
+                dondeVisita: document.getElementById('dondeVisita').value.trim()
             };
             
             try {

@@ -22,7 +22,6 @@ public string EmpresaProveniente { get; set; } = string.Empty;
 [StringLength(100, MinimumLength = 3, ErrorMessage = "El lugar de visita debe tener entre 3 y 100 caracteres")]
 public string DondeVisita { get; set; } = string.Empty;
 
-[Required(ErrorMessage = "La fecha de visita es obligatoria")]
 public DateTime FechaVisita { get; set; } = DateTime.Now;
 }
 
