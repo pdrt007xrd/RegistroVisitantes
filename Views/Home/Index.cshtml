@@ -43,25 +43,43 @@
                         <h5 class="mb-0">Agregar Contacto</h5>
                     </div>
                     <div class="card-body">
-                        <form id="formContacto">
+                        <div id="alertaError" class="alert alert-danger alert-dismissible fade" role="alert" style="display: none;">
+                            <strong>Error de validación:</strong>
+                            <ul id="listaErrores" class="mb-0 mt-2"></ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        <form id="formContacto" novalidate>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Nombre</label>
-                                    <input type="text" class="form-control" id="nombre" placeholder="Nombre completo" required>
+                                    <label class="form-label">Nombre <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="nombre" placeholder="Nombre completo" minlength="3" maxlength="100" required>
+                                    <small class="form-text text-muted">Entre 3 y 100 caracteres</small>
+                                    <div class="invalid-feedback d-block" id="errorNombre"></div>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Cédula (sin guiones)</label>
-                                    <input type="text" class="form-control" id="cedula" placeholder="00100297035" maxlength="11" required>
+                                    <label class="form-label">Cédula <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="cedula" placeholder="001-0029703-5" maxlength="13" required>
+                                    <small class="form-text text-muted">Formato: XXX-XXXXXXX-X</small>
+                                    <div class="invalid-feedback d-block" id="errorCedula"></div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Empresa Proveniente</label>
-                                    <input type="text" class="form-control" id="empresaProveniente" placeholder="Empresa">
+                                    <input type="text" class="form-control" id="empresaProveniente" placeholder="Empresa" maxlength="100">
+                                    <div class="invalid-feedback d-block" id="errorEmpresa"></div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Dónde Visita</label>
-                                    <input type="text" class="form-control" id="dondeVisita" placeholder="Departamento/Área">
+                                    <input type="text" class="form-control" id="dondeVisita" placeholder="Departamento/Área" maxlength="100">
+                                    <div class="invalid-feedback d-block" id="errorDonde"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Fecha de Visita <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="fechaVisita" required>
+                                    <div class="invalid-feedback d-block" id="errorFecha"></div>
                                 </div>
                             </div>
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -158,11 +176,92 @@
         let paginaActual = 1;
         const modal = new bootstrap.Modal(document.getElementById('modalPDF'));
 
-        // Formatear cédula XXX-XXXXXXX-X
+        // Validar y formatear cédula XXX-XXXXXXX-X
         function formatearCedula(cedula) {
             const limpia = cedula.replace(/\D/g, '');
-            if (limpia.length !== 11) return cedula;
+            if (limpia.length !== 11) return null;
             return `${limpia.substring(0, 3)}-${limpia.substring(3, 10)}-${limpia.substring(10)}`;
+        }
+
+        // Validar formulario
+        function validarFormulario() {
+            const errores = [];
+            const nombre = document.getElementById('nombre').value.trim();
+            const cedula = document.getElementById('cedula').value.trim();
+            const empresaProveniente = document.getElementById('empresaProveniente').value.trim();
+            const dondeVisita = document.getElementById('dondeVisita').value.trim();
+            const fechaVisita = document.getElementById('fechaVisita').value;
+
+            // Validar nombre
+            if (!nombre) {
+                errores.push('El nombre es obligatorio');
+                document.getElementById('errorNombre').textContent = 'El nombre es obligatorio';
+                document.getElementById('nombre').classList.add('is-invalid');
+            } else if (nombre.length < 3 || nombre.length > 100) {
+                errores.push('El nombre debe tener entre 3 y 100 caracteres');
+                document.getElementById('errorNombre').textContent = 'El nombre debe tener entre 3 y 100 caracteres';
+                document.getElementById('nombre').classList.add('is-invalid');
+            } else {
+                document.getElementById('errorNombre').textContent = '';
+                document.getElementById('nombre').classList.remove('is-invalid');
+            }
+
+            // Validar cédula
+            if (!cedula) {
+                errores.push('La cédula es obligatoria');
+                document.getElementById('errorCedula').textContent = 'La cédula es obligatoria';
+                document.getElementById('cedula').classList.add('is-invalid');
+            } else if (!formatearCedula(cedula)) {
+                errores.push('La cédula debe tener 11 dígitos (ej: 001-0029703-5 o 00100297035)');
+                document.getElementById('errorCedula').textContent = 'La cédula debe tener 11 dígitos';
+                document.getElementById('cedula').classList.add('is-invalid');
+            } else {
+                document.getElementById('errorCedula').textContent = '';
+                document.getElementById('cedula').classList.remove('is-invalid');
+            }
+
+            // Validar empresa proveniente
+            if (empresaProveniente && empresaProveniente.length > 100) {
+                errores.push('La empresa no puede exceder 100 caracteres');
+                document.getElementById('errorEmpresa').textContent = 'No puede exceder 100 caracteres';
+                document.getElementById('empresaProveniente').classList.add('is-invalid');
+            } else {
+                document.getElementById('errorEmpresa').textContent = '';
+                document.getElementById('empresaProveniente').classList.remove('is-invalid');
+            }
+
+            // Validar dónde visita
+            if (dondeVisita && dondeVisita.length > 100) {
+                errores.push('El lugar de visita no puede exceder 100 caracteres');
+                document.getElementById('errorDonde').textContent = 'No puede exceder 100 caracteres';
+                document.getElementById('dondeVisita').classList.add('is-invalid');
+            } else {
+                document.getElementById('errorDonde').textContent = '';
+                document.getElementById('dondeVisita').classList.remove('is-invalid');
+            }
+
+            // Validar fecha
+            if (!fechaVisita) {
+                errores.push('La fecha de visita es obligatoria');
+                document.getElementById('errorFecha').textContent = 'La fecha es obligatoria';
+                document.getElementById('fechaVisita').classList.add('is-invalid');
+            } else {
+                document.getElementById('errorFecha').textContent = '';
+                document.getElementById('fechaVisita').classList.remove('is-invalid');
+            }
+
+            return errores;
+        }
+
+        // Mostrar errores
+        function mostrarErrores(errores) {
+            const alertaError = document.getElementById('alertaError');
+            const listaErrores = document.getElementById('listaErrores');
+            if (errores.length > 0) {
+                listaErrores.innerHTML = errores.map(e => `<li>${e}</li>`).join('');
+                alertaError.style.display = 'block';
+                setTimeout(() => alertaError.style.display = 'none', 5000);
+            }
         }
 
         // Cargar contactos
@@ -207,35 +306,78 @@
         document.getElementById('formContacto').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const cedula = document.getElementById('cedula').value;
-            if (cedula.replace(/\D/g, '').length !== 11) {
-                alert('La cédula debe tener 11 dígitos');
+            // Validar formulario
+            const errores = validarFormulario();
+            if (errores.length > 0) {
+                mostrarErrores(errores);
                 return;
             }
             
+            const cedula = document.getElementById('cedula').value;
+            const cedulaFormateada = formatearCedula(cedula);
+            
             const contacto = {
-                nombre: document.getElementById('nombre').value,
-                cedula: formatearCedula(cedula),
-                empresaProveniente: document.getElementById('empresaProveniente').value,
-                dondeVisita: document.getElementById('dondeVisita').value
+                nombre: document.getElementById('nombre').value.trim(),
+                cedula: cedulaFormateada,
+                empresaProveniente: document.getElementById('empresaProveniente').value.trim(),
+                dondeVisita: document.getElementById('dondeVisita').value.trim(),
+                fechaVisita: document.getElementById('fechaVisita').value
             };
             
             try {
-                await fetch(API_URL, {
+                const res = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(contacto)
                 });
+
+                if (!res.ok) {
+                    const error = await res.json();
+                    const mensajes = error.errors ? Object.entries(error.errors).flatMap(([key, msgs]) => Array.isArray(msgs) ? msgs : [msgs]) : ['Error al guardar el contacto'];
+                    mostrarErrores(mensajes);
+                    return;
+                }
                 
                 const alerta = document.getElementById('alertaExito');
                 alerta.style.display = 'block';
                 setTimeout(() => alerta.style.display = 'none', 3000);
                 
                 document.getElementById('formContacto').reset();
+                // Limpiar clases de validación
+                document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
                 paginaActual = 1;
                 cargarContactos();
             } catch (error) {
-                alert('Error al guardar el contacto');
+                console.error('Error:', error);
+                mostrarErrores(['Error al guardar el contacto']);
+            }
+        });
+
+        // Validación en tiempo real
+        document.getElementById('nombre').addEventListener('input', () => {
+            const valor = document.getElementById('nombre').value.trim();
+            if (valor.length < 3 || valor.length > 100) {
+                document.getElementById('errorNombre').textContent = 'Entre 3 y 100 caracteres';
+                document.getElementById('nombre').classList.add('is-invalid');
+            } else {
+                document.getElementById('errorNombre').textContent = '';
+                document.getElementById('nombre').classList.remove('is-invalid');
+            }
+        });
+
+        document.getElementById('cedula').addEventListener('input', (e) => {
+            const valor = e.target.value;
+            const limpia = valor.replace(/\D/g, '');
+            if (limpia.length > 11) {
+                e.target.value = limpia.substring(0, 11);
+                return;
+            }
+            if (limpia.length === 11) {
+                const formateada = `${limpia.substring(0, 3)}-${limpia.substring(3, 10)}-${limpia.substring(10)}`;
+                if (valor.replace(/\D/g, '') === limpia) {
+                    e.target.value = formateada;
+                }
             }
         });
 

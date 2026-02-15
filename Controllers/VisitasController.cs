@@ -44,7 +44,11 @@ if (!ModelState.IsValid) {
 return BadRequest(ModelState);
 }
 
+// Si la fecha de visita viene vacía o es default, usar la fecha actual
+if (contacto.FechaVisita == default || contacto.FechaVisita.Year < 2020) {
 contacto.FechaVisita = DateTime.Now;
+}
+
 _context.Contactos.Add(contacto);
 await _context.SaveChangesAsync();
 
