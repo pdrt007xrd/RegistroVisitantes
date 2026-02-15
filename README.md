@@ -166,9 +166,10 @@ Este proyecto es de código abierto.
 
 ## 👨‍💻 Autor
 
-Desarrollado por: pdrt007xrd
+Desarrollado por: Pedro Peguero
 
 ## 📞 Soporte
+809-966-1111 Solo WhatsApp
 
 Para reportar problemas o sugerencias, abre un issue en GitHub.
 
